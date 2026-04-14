@@ -4,9 +4,9 @@ const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
+const RESULTADOS_VALIDOS = ['Propuesta entregada', 'Requiere seguimiento', 'Sin interés', 'Contrato cerrado'];
+
 // GET /api/visitas
-// Admin: gets all visitas, optionally filtered by ?userId=X
-// Ejecutivo: gets only own visitas
 router.get('/', requireAuth, (req, res) => {
   let rows;
   if (req.user.rol === 'admin') {
@@ -64,8 +64,24 @@ router.post('/', requireAuth, (req, res) => {
   res.status(201).json(parseVisita(newRow));
 });
 
+// PATCH /api/visitas/:id — actualizar resultado
+router.patch('/:id', requireAuth, (req, res) => {
+  const id = parseInt(req.params.id);
+  const row = db.prepare('SELECT userId FROM visitas WHERE id = ?').get(id);
+  if (!row) return res.status(404).json({ error: 'Visita no encontrada' });
+  if (req.user.rol !== 'admin' && row.userId !== req.user.id) {
+    return res.status(403).json({ error: 'No tenés permiso para editar esta visita' });
+  }
+  const { resultado } = req.body;
+  if (!resultado || !RESULTADOS_VALIDOS.includes(resultado)) {
+    return res.status(400).json({ error: 'Resultado inválido' });
+  }
+  db.prepare('UPDATE visitas SET resultado = ? WHERE id = ?').run(resultado, id);
+  const updated = db.prepare('SELECT * FROM visitas WHERE id = ?').get(id);
+  res.json(parseVisita(updated));
+});
+
 // DELETE /api/visitas/:id
-// Admin can delete any; ejecutivo can only delete own
 router.delete('/:id', requireAuth, (req, res) => {
   const id = parseInt(req.params.id);
   const row = db.prepare('SELECT userId FROM visitas WHERE id = ?').get(id);
