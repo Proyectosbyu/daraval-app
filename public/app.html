@@ -81,7 +81,7 @@
     flex-shrink: 0;
   }
 
-  .date-badge { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.05em; }
+  .date-badge { font-size: 0.78rem; color: #444444; letter-spacing: 0.05em; }
 
   .user-name { font-size: 0.82rem; color: #333333; font-weight: 500; }
 
@@ -295,7 +295,7 @@
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    background: var(--card);
+    background: #1a1a1a;
     color: #ffffff;
     padding: 1rem 1.5rem;
     border-radius: 2px;
@@ -469,10 +469,10 @@
   /* ── BAR CHART ── */
   .bar-chart { display: flex; flex-direction: column; gap: 0.6rem; }
   .bar-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; }
-  .bar-label { width: 130px; color: var(--muted); font-size: 0.75rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+  .bar-label { width: 130px; color: #444444; font-size: 0.75rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
   .bar-track { flex: 1; height: 10px; background: #f0f0f0; border-radius: 1px; overflow: hidden; }
   .bar-fill  { height: 100%; border-radius: 1px; transition: width 0.8s cubic-bezier(0.34,1.2,0.64,1); }
-  .bar-count { width: 30px; text-align: right; font-weight: 600; color: #ffffff; font-size: 0.8rem; }
+  .bar-count { width: 30px; text-align: right; font-weight: 600; color: #1a1a1a; font-size: 0.8rem; }
 
   /* ── DONUT ── */
   .donut-wrap { display: flex; align-items: center; gap: 1.5rem; }
@@ -511,7 +511,7 @@
   }
   .tl-bar:hover .tl-tip { display: block; }
   .tl-labels { display: flex; gap: 6px; margin-top: 6px; }
-  .tl-label { flex: 1; font-size: 0.65rem; color: var(--muted); text-align: center; }
+  .tl-label { flex: 1; font-size: 0.65rem; color: #6b7280; text-align: center; }
 
   .full-chart { grid-column: span 2; }
 
@@ -831,14 +831,14 @@
 
     <div class="registros-header">
       <input type="text" class="filter-input" placeholder="Buscar por empresa, contacto, barrio..." oninput="filtrarRegistros(this.value)">
-      <select style="padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:2px;background:var(--card);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#cccccc;" onchange="filtrarPorResultado(this.value)">
+      <select style="padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:2px;background:#ffffff;font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#1a1a1a;" onchange="filtrarPorResultado(this.value)">
         <option value="">Todos los resultados</option>
         <option>Propuesta entregada</option>
         <option>Requiere seguimiento</option>
         <option>Sin interés</option>
         <option>Contrato cerrado</option>
       </select>
-      <select id="ejecutivoFilter" style="display:none;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:2px;background:var(--card);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#cccccc;" onchange="onEjecutivoFilterChange(this.value)">
+      <select id="ejecutivoFilter" style="display:none;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:2px;background:#ffffff;font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#1a1a1a;" onchange="onEjecutivoFilterChange(this.value)">
         <option value="">Todos los ejecutivos</option>
       </select>
       <div class="export-btns">
@@ -1337,10 +1337,10 @@ function renderUsersTable(users) {
   if (!tbody) return;
   tbody.innerHTML = users.map(u => `
     <tr>
-      <td><strong style="color:#ffffff">${esc(u.nombre)}</strong></td>
+      <td><strong style="color:#1a1a1a">${esc(u.nombre)}</strong></td>
       <td>${esc(u.email)}</td>
       <td><span class="user-role-badge${u.rol === 'admin' ? ' admin' : ''}">${u.rol}</span></td>
-      <td style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#ffffff">${u.visitCount}</td>
+      <td style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#1a1a1a">${u.visitCount}</td>
       <td>${new Date(u.createdAt).toLocaleDateString('es-AR')}</td>
       <td class="actions-cell">
         <button class="btn-sm info" onclick="openResetModal(${u.id}, '${esc(u.nombre)}')">Reset pwd</button>
