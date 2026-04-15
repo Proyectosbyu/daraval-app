@@ -64,6 +64,54 @@ router.post('/', requireAuth, (req, res) => {
   res.status(201).json(parseVisita(newRow));
 });
 
+// PUT /api/visitas/:id — editar todos los campos
+router.put('/:id', requireAuth, (req, res) => {
+  const id  = parseInt(req.params.id);
+  const row = db.prepare('SELECT userId FROM visitas WHERE id = ?').get(id);
+  if (!row) return res.status(404).json({ error: 'Visita no encontrada' });
+  if (req.user.rol !== 'admin' && row.userId !== req.user.id) {
+    return res.status(403).json({ error: 'No tenés permiso para editar esta visita' });
+  }
+  const b = req.body;
+  if (!b.barrio || !b.contactoEmpresa) {
+    return res.status(400).json({ error: 'Barrio y empresa son requeridos' });
+  }
+  db.prepare(`
+    UPDATE visitas SET
+      ejecutivo=@ejecutivo, fecha=@fecha, hora=@hora, barrio=@barrio,
+      direccion=@direccion, tipoVisita=@tipoVisita,
+      contactoNombre=@contactoNombre, contactoCargo=@contactoCargo,
+      contactoEmpresa=@contactoEmpresa, contactoTel=@contactoTel,
+      contactoEmail=@contactoEmail, contactoRubro=@contactoRubro,
+      productos=@productos, resultado=@resultado,
+      proximaAccion=@proximaAccion, fechaSeguimiento=@fechaSeguimiento,
+      notas=@notas, montoPotencial=@montoPotencial
+    WHERE id=@id
+  `).run({
+    id,
+    ejecutivo:       b.ejecutivo       || '',
+    fecha:           b.fecha           || '',
+    hora:            b.hora            || '',
+    barrio:          b.barrio          || '',
+    direccion:       b.direccion       || '',
+    tipoVisita:      b.tipoVisita      || '',
+    contactoNombre:  b.contactoNombre  || '',
+    contactoCargo:   b.contactoCargo   || '',
+    contactoEmpresa: b.contactoEmpresa || '',
+    contactoTel:     b.contactoTel     || '',
+    contactoEmail:   b.contactoEmail   || '',
+    contactoRubro:   b.contactoRubro   || '',
+    productos:       JSON.stringify(Array.isArray(b.productos) ? b.productos : []),
+    resultado:       RESULTADOS_VALIDOS.includes(b.resultado) ? b.resultado : '',
+    proximaAccion:   b.proximaAccion   || '',
+    fechaSeguimiento:b.fechaSeguimiento|| '',
+    notas:           b.notas           || '',
+    montoPotencial:  parseFloat(b.montoPotencial) || 0,
+  });
+  const updated = db.prepare('SELECT * FROM visitas WHERE id = ?').get(id);
+  res.json(parseVisita(updated));
+});
+
 // PATCH /api/visitas/:id — actualizar resultado
 router.patch('/:id', requireAuth, (req, res) => {
   const id = parseInt(req.params.id);

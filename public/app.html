@@ -698,6 +698,45 @@
     padding: 1rem 1.75rem 1.5rem;
     border-top: 1px solid #f0f0f0;
   }
+
+  /* ── EDIT REGISTRO MODAL ── */
+  .edit-reg-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 300;
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 2rem 1rem; overflow-y: auto;
+  }
+  .edit-reg-overlay.open { display: flex; }
+  .edit-reg-card {
+    background: #ffffff;
+    border-radius: 8px;
+    width: 100%; max-width: 680px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    margin: auto;
+  }
+  .edit-reg-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky; top: 0; background: #ffffff; z-index: 1;
+    border-radius: 8px 8px 0 0;
+  }
+  .edit-reg-header h2 {
+    font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: #1a1a1a;
+  }
+  .edit-reg-body { padding: 1.5rem 1.75rem; }
+  .edit-reg-section-title {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #9ca3af;
+    margin: 1.25rem 0 0.75rem; padding-bottom: 0.4rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .edit-reg-section-title:first-child { margin-top: 0; }
+  .edit-reg-footer {
+    display: flex; gap: 0.75rem; justify-content: flex-end;
+    padding: 1rem 1.75rem 1.5rem; border-top: 1px solid #f0f0f0;
+  }
 </style>
 </head>
 <body>
@@ -765,6 +804,160 @@
     </div>
     <div class="detail-modal-body" id="detailBody"></div>
     <div class="detail-footer" id="detailFooter"></div>
+  </div>
+</div>
+
+
+<!-- Edit Registro Modal -->
+<div class="edit-reg-overlay" id="editRegModal" onclick="if(event.target===this)closeEditRegModal()">
+  <div class="edit-reg-card">
+    <div class="edit-reg-header">
+      <h2>Editar registro</h2>
+      <button class="detail-close-btn" onclick="closeEditRegModal()">✕</button>
+    </div>
+    <div class="edit-reg-body">
+
+      <div class="edit-reg-section-title">Visita</div>
+      <div class="form-grid three">
+        <div class="field">
+          <label>Ejecutivo</label>
+          <input type="text" id="er_ejecutivo">
+        </div>
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" id="er_fecha">
+        </div>
+        <div class="field">
+          <label>Hora</label>
+          <input type="time" id="er_hora">
+        </div>
+        <div class="field">
+          <label>Barrio / Zona</label>
+          <select id="er_barrio">
+            <option value="">— Seleccioná —</option>
+            <optgroup label="Zona Norte">
+              <option>Palermo</option><option>Belgrano</option><option>Núñez</option>
+              <option>Saavedra</option><option>Coghlan</option><option>Villa Urquiza</option>
+              <option>Villa Pueyrredón</option><option>Colegiales</option>
+            </optgroup>
+            <optgroup label="Zona Centro">
+              <option>San Nicolás (Microcentro)</option><option>Monserrat</option>
+              <option>San Telmo</option><option>Puerto Madero</option>
+              <option>Retiro</option><option>Recoleta</option>
+            </optgroup>
+            <optgroup label="Zona Oeste">
+              <option>Caballito</option><option>Flores</option><option>Floresta</option>
+              <option>Villa del Parque</option><option>Villa Santa Rita</option>
+              <option>Monte Castro</option><option>Versalles</option><option>Liniers</option>
+              <option>Mataderos</option><option>Parque Avellaneda</option>
+              <option>Villa Luro</option><option>Vélez Sársfield</option>
+            </optgroup>
+            <optgroup label="Zona Sur">
+              <option>Boedo</option><option>Nueva Pompeya</option><option>Parque Chacabuco</option>
+              <option>Parque Patricios</option><option>La Boca</option><option>Barracas</option>
+              <option>Villa Lugano</option><option>Villa Riachuelo</option>
+              <option>Villa Soldati</option><option>Constitución</option>
+            </optgroup>
+            <optgroup label="Zona Este / Corredor">
+              <option>Almagro</option><option>Balvanera</option><option>Villa Crespo</option>
+              <option>Chacarita</option><option>Paternal</option><option>Villa General Mitre</option>
+              <option>Villa Devoto</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field">
+          <label>Dirección / Empresa</label>
+          <input type="text" id="er_direccion">
+        </div>
+        <div class="field">
+          <label>Tipo de Visita</label>
+          <select id="er_tipoVisita">
+            <option value="">— Tipo —</option>
+            <option>Visita presencial</option>
+            <option>Llamada telefónica</option>
+            <option>Reunión virtual</option>
+            <option>Evento / Feria</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="edit-reg-section-title">Contacto</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Nombre del Contacto</label>
+          <input type="text" id="er_contactoNombre">
+        </div>
+        <div class="field">
+          <label>Cargo / Posición</label>
+          <input type="text" id="er_contactoCargo">
+        </div>
+        <div class="field">
+          <label>Empresa / Razón Social</label>
+          <input type="text" id="er_contactoEmpresa">
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="tel" id="er_contactoTel">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="er_contactoEmail">
+        </div>
+        <div class="field">
+          <label>Rubro / Industria</label>
+          <select id="er_contactoRubro">
+            <option value="">— Seleccioná —</option>
+            <option>Retail / Comercio</option><option>Gastronomía</option>
+            <option>Manufactura / Industria</option><option>Servicios profesionales</option>
+            <option>Tecnología</option><option>Salud / Farma</option>
+            <option>Construcción / Real Estate</option><option>Logística / Transporte</option>
+            <option>Educación</option><option>Agro / Campo</option>
+            <option>Financiero / Seguros</option><option>Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="edit-reg-section-title">Productos Ofrecidos</div>
+      <div class="producto-grid" id="er_productosGrid">
+        <div class="producto-tag" onclick="toggleTag(this)">Garantía de Alquiler</div>
+        <div class="producto-tag" onclick="toggleTag(this)">Garantía Comercial</div>
+      </div>
+
+      <div class="edit-reg-section-title">Resultado y Seguimiento</div>
+      <div class="form-grid">
+        <div class="field span2">
+          <label>Resultado</label>
+          <div class="resultado-options" style="grid-template-columns:repeat(4,1fr)" id="er_resultadoOptions">
+            <div class="resultado-option azul"         onclick="erSelectResultado(this,'Propuesta entregada')">→ Propuesta entregada</div>
+            <div class="resultado-option amarillo"     onclick="erSelectResultado(this,'Requiere seguimiento')">⏱ Requiere seguimiento</div>
+            <div class="resultado-option rojo"         onclick="erSelectResultado(this,'Sin interés')">✕ Sin interés</div>
+            <div class="resultado-option verde-oscuro" onclick="erSelectResultado(this,'Contrato cerrado')">✓ Contrato cerrado</div>
+          </div>
+          <input type="hidden" id="er_resultado">
+        </div>
+        <div class="field">
+          <label>Próxima Acción</label>
+          <input type="text" id="er_proximaAccion">
+        </div>
+        <div class="field">
+          <label>Fecha de Seguimiento</label>
+          <input type="date" id="er_fechaSeguimiento">
+        </div>
+        <div class="field span2">
+          <label>Notas</label>
+          <textarea id="er_notas" style="min-height:120px"></textarea>
+        </div>
+        <div class="field span2">
+          <label>Monto Potencial (ARS)</label>
+          <input type="number" id="er_montoPotencial">
+        </div>
+      </div>
+
+    </div>
+    <div class="edit-reg-footer">
+      <button class="btn btn-secondary" onclick="closeEditRegModal()">Cancelar</button>
+      <button class="btn btn-primary" id="erSaveBtn" onclick="doEditRegistro()">Guardar cambios →</button>
+    </div>
   </div>
 </div>
 
@@ -1765,6 +1958,7 @@ function openDetailModal(id) {
 
   const canEdit = currentUser?.rol === 'admin' || v.userId === currentUser?.id;
   document.getElementById('detailFooter').innerHTML = `
+    ${canEdit ? `<button class="btn btn-primary" onclick="closeDetailModal();openEditRegModal(${v.id})">✎ Editar registro</button>` : ''}
     ${canEdit ? `<button class="btn btn-secondary" onclick="closeDetailModal();openEditEstadoModal(${v.id},'${esc(v.resultado||'')}')">Cambiar estado</button>` : ''}
     ${canEdit ? `<button class="btn btn-secondary" style="color:#dc2626;border-color:rgba(255,61,0,0.3)" onclick="closeDetailModal();deleteVisita(${v.id})">Eliminar</button>` : ''}
   `;
@@ -1776,6 +1970,151 @@ function openDetailModal(id) {
 function closeDetailModal() {
   document.getElementById('detailModal').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+
+// ── EDIT REGISTRO MODAL ──
+let erEditingId = null;
+let erResultadoSeleccionado = '';
+
+function openEditRegModal(id) {
+  const v = visitas.find(x => x.id === id);
+  if (!v) return;
+  erEditingId = id;
+  erResultadoSeleccionado = v.resultado || '';
+
+  // Fill basic fields
+  const set = (elId, val) => { const el = document.getElementById(elId); if (el) el.value = val || ''; };
+  set('er_ejecutivo',        v.ejecutivo);
+  set('er_fecha',            v.fecha);
+  set('er_hora',             v.hora);
+  set('er_direccion',        v.direccion);
+  set('er_contactoNombre',   v.contactoNombre);
+  set('er_contactoCargo',    v.contactoCargo);
+  set('er_contactoEmpresa',  v.contactoEmpresa);
+  set('er_contactoTel',      v.contactoTel);
+  set('er_contactoEmail',    v.contactoEmail);
+  set('er_proximaAccion',    v.proximaAccion);
+  set('er_fechaSeguimiento', v.fechaSeguimiento);
+  set('er_notas',            v.notas);
+  set('er_montoPotencial',   v.montoPotencial || '');
+  set('er_resultado',        v.resultado);
+
+  // Select dropdowns
+  const setSelect = (elId, val) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    [...el.options].forEach(o => { o.selected = o.value === val; });
+    if (![...el.options].some(o => o.value === val)) el.value = '';
+  };
+  setSelect('er_barrio',        v.barrio);
+  setSelect('er_tipoVisita',    v.tipoVisita);
+  setSelect('er_contactoRubro', v.contactoRubro);
+
+  // Resultado options
+  document.querySelectorAll('#er_resultadoOptions .resultado-option').forEach(opt => {
+    opt.classList.remove('selected');
+    const classes = ['azul','amarillo','rojo','verde-oscuro'];
+    classes.forEach(cls => opt.classList.remove(cls));
+    // re-add the base color class
+    const map = {
+      'Propuesta entregada': 'azul', 'Requiere seguimiento': 'amarillo',
+      'Sin interés': 'rojo', 'Contrato cerrado': 'verde-oscuro'
+    };
+    const txt = opt.textContent.trim().replace(/^[^w]+/, '').trim();
+    // match by onclick value
+    const onclickVal = opt.getAttribute('onclick').match(/'([^']+)')/)?.[1];
+    if (onclickVal) {
+      opt.classList.add(map[onclickVal] || 'azul');
+      if (onclickVal === v.resultado) opt.classList.add('selected');
+    }
+  });
+
+  // Productos
+  const prods = v.productos || [];
+  document.querySelectorAll('#er_productosGrid .producto-tag').forEach(tag => {
+    tag.classList.toggle('selected', prods.includes(tag.textContent.trim()));
+  });
+
+  document.getElementById('editRegModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditRegModal() {
+  document.getElementById('editRegModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function erSelectResultado(el, valor) {
+  document.querySelectorAll('#er_resultadoOptions .resultado-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  erResultadoSeleccionado = valor;
+  document.getElementById('er_resultado').value = valor;
+}
+
+async function doEditRegistro() {
+  if (!erEditingId) return;
+
+  const get = id => document.getElementById(id)?.value?.trim() || '';
+  const barrio          = get('er_barrio');
+  const contactoEmpresa = get('er_contactoEmpresa');
+
+  if (!barrio || !contactoEmpresa) {
+    alert('Barrio y empresa son campos requeridos.');
+    return;
+  }
+
+  const productos = [...document.querySelectorAll('#er_productosGrid .producto-tag.selected')]
+    .map(t => t.textContent.trim());
+
+  const payload = {
+    ejecutivo:        get('er_ejecutivo'),
+    fecha:            get('er_fecha'),
+    hora:             get('er_hora'),
+    barrio,
+    direccion:        get('er_direccion'),
+    tipoVisita:       get('er_tipoVisita'),
+    contactoNombre:   get('er_contactoNombre'),
+    contactoCargo:    get('er_contactoCargo'),
+    contactoEmpresa,
+    contactoTel:      get('er_contactoTel'),
+    contactoEmail:    get('er_contactoEmail'),
+    contactoRubro:    get('er_contactoRubro'),
+    productos,
+    resultado:        erResultadoSeleccionado || get('er_resultado'),
+    proximaAccion:    get('er_proximaAccion'),
+    fechaSeguimiento: get('er_fechaSeguimiento'),
+    notas:            document.getElementById('er_notas')?.value || '',
+    montoPotencial:   parseFloat(document.getElementById('er_montoPotencial')?.value) || 0,
+  };
+
+  const btn = document.getElementById('erSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  try {
+    const res = await api('/visitas/' + erEditingId, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    if (!res || !res.ok) {
+      const err = await res?.json();
+      alert(err?.error || 'Error al guardar.');
+      return;
+    }
+    const updated = await res.json();
+    // Update local array
+    const idx = visitas.findIndex(x => x.id === erEditingId);
+    if (idx !== -1) visitas[idx] = updated;
+    closeEditRegModal();
+    renderRegistros();
+    showToast('Registro actualizado correctamente');
+  } catch (e) {
+    alert('Error de conexión.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar cambios →';
+  }
 }
 
 </script>
