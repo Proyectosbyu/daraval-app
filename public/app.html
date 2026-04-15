@@ -2023,7 +2023,7 @@ function openEditRegModal(id) {
     };
     const txt = opt.textContent.trim().replace(/^[^w]+/, '').trim();
     // match by onclick value
-    const onclickVal = opt.getAttribute('onclick').match(/'([^']+)')/)?.[1];
+    const onclickVal = opt.getAttribute('onclick').match(/'([^']+)'/)?.[1];
     if (onclickVal) {
       opt.classList.add(map[onclickVal] || 'azul');
       if (onclickVal === v.resultado) opt.classList.add('selected');
