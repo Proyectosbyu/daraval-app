@@ -566,6 +566,63 @@
     color: #1a1a1a;
   }
 
+  /* ── BADGE PENDIENTES ── */
+  .pending-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--danger);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.62rem;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    margin-left: 5px;
+    font-weight: 700;
+    vertical-align: middle;
+    line-height: 1;
+  }
+
+  /* ── ALERTA PENDIENTES ── */
+  #alertaPendientes {
+    margin: 1.25rem 2rem 0;
+    background: rgba(255,171,0,0.07);
+    border: 1px solid rgba(255,171,0,0.25);
+    border-left: 4px solid var(--gold);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px) } to { opacity:1; transform:none } }
+  #alertaPendientes .alerta-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+  #alertaPendientes .alerta-body { flex: 1; min-width: 0; }
+  #alertaPendientes .alerta-titulo {
+    font-weight: 600; font-size: 0.9rem; color: var(--gold); margin-bottom: 0.4rem;
+  }
+  #alertaPendientes .alerta-items {
+    list-style: none; font-size: 0.82rem; color: #cccccc; display: flex; flex-direction: column; gap: 0.2rem;
+  }
+  #alertaPendientes .alerta-items li { display: flex; align-items: center; gap: 0.4rem; }
+  #alertaPendientes .alerta-items .vencida { color: var(--danger); font-size: 0.72rem; font-weight: 600; }
+  #alertaPendientes .alerta-items .hoy { color: var(--gold); font-size: 0.72rem; font-weight: 600; }
+  #alertaPendientes .alerta-btns { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  .btn-alerta {
+    padding: 0.35rem 0.85rem; border-radius: 2px; font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; border: 1px solid; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
+  }
+  .btn-alerta:hover { opacity: 0.8; }
+  .btn-alerta-primary { background: var(--gold); color: #0a0a0a; border-color: var(--gold); }
+  .btn-alerta-ghost { background: transparent; color: var(--muted); border-color: var(--border); }
+  #alertaPendientes .alerta-close {
+    background: none; border: none; color: var(--muted); font-size: 1.1rem;
+    cursor: pointer; padding: 0 0.25rem; flex-shrink: 0; align-self: flex-start;
+  }
+  #alertaPendientes .alerta-close:hover { color: #fff; }
+
   /* ── SPINNER ── */
   .spinner {
     display: inline-block;
@@ -745,7 +802,7 @@
   <div class="logo">Dar<span>Aval</span></div>
   <nav class="nav-tabs">
     <button class="nav-tab active" onclick="showSection('nueva', this)">Nueva Visita</button>
-    <button class="nav-tab" onclick="showSection('registros', this)">Registros</button>
+    <button class="nav-tab" onclick="showSection('registros', this)">Registros <span class="pending-badge" id="pendienteBadge" style="display:none">0</span></button>
     <button class="nav-tab" onclick="showSection('analytics', this)">Análisis</button>
     <button class="nav-tab" id="tabAdmin" style="display:none" onclick="showSection('admin', this)">Admin</button>
   </nav>
@@ -963,6 +1020,9 @@
 
 <main>
 
+  <!-- ══════════ ALERTA SEGUIMIENTOS ══════════ -->
+  <div id="alertaPendientes" style="display:none"></div>
+
   <!-- ══════════ NUEVA VISITA ══════════ -->
   <section id="nueva" class="section active">
     <div class="page-header">
@@ -1142,6 +1202,7 @@
       <select id="ejecutivoFilter" style="display:none;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:2px;background:#ffffff;font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#1a1a1a;" onchange="onEjecutivoFilterChange(this.value)">
         <option value="">Todos los ejecutivos</option>
       </select>
+      <button id="btnFiltroPendientes" onclick="filtrarSoloSeguimientos()" style="display:none;padding:0.5rem 1rem;background:rgba(255,171,0,0.1);border:1px solid rgba(255,171,0,0.4);color:var(--gold);border-radius:2px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;">⏰ Ver pendientes</button>
       <div class="export-btns">
         <button class="btn-export excel" onclick="exportar('excel')">↓ Excel</button>
         <button class="btn-export pdf"   onclick="exportar('pdf')">↓ PDF</button>
@@ -1334,6 +1395,7 @@ async function loadVisitas(userId) {
   if (!res || !res.ok) return;
   visitas = await res.json();
   renderRegistros();
+  renderPendientesAlert();
 }
 
 // ── NAV ──
@@ -1486,6 +1548,92 @@ async function doEditEstado() {
     alert(err.error || 'Error al actualizar.');
   }
 }
+
+// ── ALERTA SEGUIMIENTOS PENDIENTES ──
+function renderPendientesAlert() {
+  const hoy   = new Date().toISOString().split('T')[0];
+  const panel = document.getElementById('alertaPendientes');
+  const badge = document.getElementById('pendienteBadge');
+  const btnFiltro = document.getElementById('btnFiltroPendientes');
+
+  const pendientes = visitas.filter(v =>
+    v.resultado === 'Requiere seguimiento' && v.fechaSeguimiento && v.fechaSeguimiento <= hoy
+  );
+
+  const vencidas = pendientes.filter(v => v.fechaSeguimiento < hoy);
+  const deHoy    = pendientes.filter(v => v.fechaSeguimiento === hoy);
+
+  // Badge en tab
+  if (pendientes.length) {
+    badge.textContent = pendientes.length;
+    badge.style.display = '';
+    if (btnFiltro) btnFiltro.style.display = '';
+  } else {
+    badge.style.display = 'none';
+    if (btnFiltro) btnFiltro.style.display = 'none';
+  }
+
+  // Panel: no mostrar si fue cerrado en esta sesión o no hay pendientes
+  const cerrado = sessionStorage.getItem('alertaCerrada');
+  if (!pendientes.length || cerrado) { panel.style.display = 'none'; return; }
+
+  const titulo = vencidas.length && deHoy.length
+    ? `Tenés ${vencidas.length} seguimiento${vencidas.length > 1 ? 's' : ''} vencido${vencidas.length > 1 ? 's' : ''} y ${deHoy.length} para hoy`
+    : vencidas.length
+      ? `Tenés ${vencidas.length} seguimiento${vencidas.length > 1 ? 's' : ''} vencido${vencidas.length > 1 ? 's' : ''}`
+      : `Tenés ${deHoy.length} seguimiento${deHoy.length > 1 ? 's' : ''} para hoy`;
+
+  const items = pendientes.slice(0, 5).map(v => {
+    const tag = v.fechaSeguimiento < hoy
+      ? `<span class="vencida">VENCIDO</span>`
+      : `<span class="hoy">HOY</span>`;
+    const empresa = esc(v.contactoEmpresa || '—');
+    const contacto = v.contactoNombre ? ` · ${esc(v.contactoNombre)}` : '';
+    return `<li>${tag} ${empresa}${contacto}</li>`;
+  }).join('');
+
+  const masItems = pendientes.length > 5
+    ? `<li style="color:var(--muted);font-style:italic">y ${pendientes.length - 5} más...</li>`
+    : '';
+
+  panel.innerHTML = `
+    <div class="alerta-icon">⏰</div>
+    <div class="alerta-body">
+      <div class="alerta-titulo">${titulo}</div>
+      <ul class="alerta-items">${items}${masItems}</ul>
+      <div class="alerta-btns">
+        <button class="btn-alerta btn-alerta-primary" onclick="irASeguimientos()">Ver seguimientos →</button>
+        <button class="btn-alerta btn-alerta-ghost" onclick="cerrarAlerta()">Descartar</button>
+      </div>
+    </div>
+    <button class="alerta-close" onclick="cerrarAlerta()" title="Cerrar">✕</button>
+  `;
+  panel.style.display = 'flex';
+}
+
+function cerrarAlerta() {
+  sessionStorage.setItem('alertaCerrada', '1');
+  document.getElementById('alertaPendientes').style.display = 'none';
+}
+
+function irASeguimientos() {
+  cerrarAlerta();
+  filtrarSoloSeguimientos();
+}
+
+function filtrarSoloSeguimientos() {
+  const hoy = new Date().toISOString().split('T')[0];
+  // Aplicar filtro visual en Registros
+  filtroResultado = 'Requiere seguimiento';
+  const select = document.querySelector('#registros select');
+  if (select) select.value = 'Requiere seguimiento';
+  renderRegistros();
+  // Navegar al tab Registros
+  const tabBtn = [...document.querySelectorAll('.nav-tab')]
+    .find(b => b.textContent.includes('Registros'));
+  if (tabBtn) showSection('registros', tabBtn);
+}
+
 // ── FILTROS ──
 function filtrarRegistros(val) { filtroTexto = val.toLowerCase(); renderRegistros(); }
 function filtrarPorResultado(val) { filtroResultado = val; renderRegistros(); }
