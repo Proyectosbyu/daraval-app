@@ -3,7 +3,18 @@ const fs        = require('fs');
 const path      = require('path');
 const bcrypt    = require('bcryptjs');
 
-const dbPath = process.env.DB_PATH || path.join(__dirname, 'fieldlog.db');
+// Si DB_PATH apunta a un directorio que no existe (ej: volumen no montado),
+// caemos al directorio local para que el servidor arranque igual.
+function resolveDbPath() {
+  const configured = process.env.DB_PATH || path.join(__dirname, 'fieldlog.db');
+  const dir = path.dirname(configured);
+  if (!fs.existsSync(dir)) {
+    console.warn(`  [db] Directorio "${dir}" no existe, usando directorio local.`);
+    return path.join(__dirname, 'fieldlog.db');
+  }
+  return configured;
+}
+const dbPath = resolveDbPath();
 
 let _sqlDb = null; // sql.js Database instance (in-memory)
 
